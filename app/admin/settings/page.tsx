@@ -80,6 +80,23 @@ export default async function AdminSettingsPage({ searchParams }: Props) {
           <input name="metrika_id" defaultValue={settings.metrika_id} placeholder="12345678" />
         </div>
 
+        <h2 className="text-lg font-semibold">CRM шаблоны ответа</h2>
+        <p className="text-sm text-slate-300">
+          Плейсхолдеры: {"{id}"}, {"{name}"}, {"{phone}"}, {"{car_brand}"}, {"{car_model}"}, {"{car_year}"}, {"{features}"}, {"{center_name}"}
+        </p>
+        <div>
+          <label className="mb-1 block text-sm">Шаблон WhatsApp</label>
+          <textarea name="whatsapp_template" rows={3} defaultValue={settings.whatsapp_template} />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm">Шаблон Telegram</label>
+          <textarea name="telegram_template" rows={3} defaultValue={settings.telegram_template} />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm">Скрипт звонка</label>
+          <textarea name="call_template" rows={4} defaultValue={settings.call_template} />
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm">SEO title (по умолчанию)</label>

@@ -53,9 +53,14 @@ export async function GET(request: Request) {
   const statusParam = searchParams.get("status") || "all";
   const status: "all" | "new" | "in_progress" | "closed" =
     statusParam === "new" || statusParam === "in_progress" || statusParam === "closed" ? statusParam : "all";
+  const tagParam = searchParams.get("tag") || "all";
+  const tag: "all" | "warranty" | "autostart" | "consultation" | "sla_overdue" =
+    tagParam === "warranty" || tagParam === "autostart" || tagParam === "consultation" || tagParam === "sla_overdue"
+      ? tagParam
+      : "all";
   const query = searchParams.get("q") || "";
 
-  const requests = listContactRequestsFiltered({ status, query });
+  const requests = listContactRequestsFiltered({ status, tag, query });
 
   const headers = [
     "ID",

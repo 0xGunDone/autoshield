@@ -136,3 +136,31 @@ export async function sendTelegramRequestNotification(request: ContactRequest): 
     })
   });
 }
+
+export async function sendTelegramSlaAlert(request: ContactRequest): Promise<void> {
+  const settings = getSiteSettings();
+
+  if (!settings.telegram_bot_token || !settings.telegram_chat_id) {
+    return;
+  }
+
+  const ageMinutes = Math.max(0, Math.floor((Date.now() - Date.parse(request.created_at)) / 60_000));
+
+  const text = [
+    "SLA ALERT: новая заявка без ответа",
+    `Заявка: #${request.id}`,
+    `Возраст: ${ageMinutes} мин`,
+    `Имя: ${request.name}`,
+    `Телефон: ${request.phone}`,
+    `Авто: ${request.car_brand} ${request.car_model}, ${request.car_year}`
+  ].join("\n");
+
+  await fetch(`https://api.telegram.org/bot${settings.telegram_bot_token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: settings.telegram_chat_id,
+      text
+    })
+  });
+}

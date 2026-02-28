@@ -49,6 +49,9 @@ export const settingsSchema = z.object({
     .max(30)
     .default("")
     .refine((value) => !value || /^\d+$/.test(value), "ID Метрики должен содержать только цифры"),
+  whatsapp_template: z.string().max(2000).default(""),
+  telegram_template: z.string().max(2000).default(""),
+  call_template: z.string().max(3000).default(""),
   address: z.string().min(4).max(220),
   work_hours: z.string().min(4).max(180),
   map_iframe: z.string().max(3000).default(""),

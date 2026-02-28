@@ -22,6 +22,9 @@ export function updateSiteSettings(input: Omit<SiteSettings, "id" | "updated_at"
       telegram_bot_token = @telegram_bot_token,
       telegram_chat_id = @telegram_chat_id,
       metrika_id = @metrika_id,
+      whatsapp_template = @whatsapp_template,
+      telegram_template = @telegram_template,
+      call_template = @call_template,
       address = @address,
       work_hours = @work_hours,
       map_iframe = @map_iframe,
@@ -222,7 +225,11 @@ export function countContactRequestsByStatus(): { new: number; in_progress: numb
   };
 }
 
-export function listContactRequestsFiltered(params: { status?: "all" | "new" | "in_progress" | "closed"; query?: string }): ContactRequest[] {
+export function listContactRequestsFiltered(params: {
+  status?: "all" | "new" | "in_progress" | "closed";
+  query?: string;
+  tag?: "all" | "warranty" | "autostart" | "consultation" | "sla_overdue";
+}): ContactRequest[] {
   const clauses: string[] = [];
   const values: unknown[] = [];
 
@@ -237,6 +244,23 @@ export function listContactRequestsFiltered(params: { status?: "all" | "new" | "
     values.push(like, like, like, like);
   }
 
+  if (params.tag && params.tag !== "all") {
+    if (params.tag === "warranty") {
+      clauses.push("is_under_warranty = 1");
+    }
+    if (params.tag === "autostart") {
+      clauses.push("needs_autostart = 1");
+    }
+    if (params.tag === "consultation") {
+      clauses.push("selection_stage = 'consultation'");
+    }
+    if (params.tag === "sla_overdue") {
+      const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+      clauses.push("status = 'new' AND created_at <= ?");
+      values.push(cutoff);
+    }
+  }
+
   const whereClause = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
   return db.prepare(`SELECT * FROM contact_requests ${whereClause} ORDER BY created_at DESC`).all(...values) as ContactRequest[];
 }
@@ -246,12 +270,37 @@ export function getContactRequestById(id: number): ContactRequest | undefined {
 }
 
 export function updateContactRequestStatus(id: number, status: "new" | "in_progress" | "closed"): void {
+  if (status === "new") {
+    db.prepare("UPDATE contact_requests SET status = ?, sla_alert_sent_at = '' WHERE id = ?").run(status, id);
+    return;
+  }
   db.prepare("UPDATE contact_requests SET status = ? WHERE id = ?").run(status, id);
 }
 
+export function listSlaOverdueRequests(minutes = 15): ContactRequest[] {
+  const rows = db
+    .prepare(
+      `
+      SELECT * FROM contact_requests
+      WHERE status = 'new'
+        AND (sla_alert_sent_at IS NULL OR sla_alert_sent_at = '')
+      ORDER BY created_at ASC
+      `
+    )
+    .all() as ContactRequest[];
+
+  const threshold = Date.now() - minutes * 60 * 1000;
+  return rows.filter((item) => Date.parse(item.created_at) <= threshold);
+}
+
+export function markContactRequestSlaAlertSent(id: number): void {
+  db.prepare("UPDATE contact_requests SET sla_alert_sent_at = ? WHERE id = ?").run(now(), id);
+}
+
 export function createContactRequest(
-  input: Omit<ContactRequest, "id" | "created_at"> & {
+  input: Omit<ContactRequest, "id" | "created_at" | "sla_alert_sent_at"> & {
     created_at?: string;
+    sla_alert_sent_at?: string;
   }
 ): number {
   const result = db
@@ -259,16 +308,16 @@ export function createContactRequest(
       `
       INSERT INTO contact_requests (
         name, phone, car_brand, car_model, car_year, start_type, is_under_warranty,
-        features_json, needs_old_demount, selection_stage, desired_slot, status,
+        features_json, needs_old_demount, selection_stage, desired_slot, status, sla_alert_sent_at,
         service_id, service_name, comment, needs_autostart, consent, ip, created_at
       ) VALUES (
         @name, @phone, @car_brand, @car_model, @car_year, @start_type, @is_under_warranty,
-        @features_json, @needs_old_demount, @selection_stage, @desired_slot, @status,
+        @features_json, @needs_old_demount, @selection_stage, @desired_slot, @status, @sla_alert_sent_at,
         @service_id, @service_name, @comment, @needs_autostart, @consent, @ip, @created_at
       )
       `
     )
-    .run({ ...input, created_at: input.created_at || now() });
+    .run({ ...input, sla_alert_sent_at: input.sla_alert_sent_at || "", created_at: input.created_at || now() });
 
   return Number(result.lastInsertRowid);
 }

@@ -1,13 +1,15 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { buildServiceModelPages } from "@/lib/model-pages";
+import { buildAlternates } from "@/lib/seo";
 import { listServices } from "@/lib/repository";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Модели StarLine",
-  description: "Отдельные SEO-страницы моделей сигнализаций StarLine с актуальными вариантами установки и ценами от."
+  description: "Отдельные SEO-страницы моделей сигнализаций StarLine с актуальными вариантами установки и ценами от.",
+  alternates: buildAlternates("/models")
 };
 
 export default function ModelsPage() {

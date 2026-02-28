@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo";
 import { listPricing } from "@/lib/repository";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Цены",
-  description: "Актуальные цены на установку охранных систем и дооснащение автомобилей в Твери."
+  description: "Актуальные цены на установку охранных систем и дооснащение автомобилей в Твери.",
+  alternates: buildAlternates("/pricing")
 };
 
 export default function PricingPage() {

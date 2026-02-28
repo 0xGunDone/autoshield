@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ContactForm } from "@/components/ContactForm";
 import { MessengerCta } from "@/components/MessengerCta";
 import { ServiceCalculator } from "@/components/ServiceCalculator";
+import { buildAlternates } from "@/lib/seo";
 import { getServiceBySlug, getSiteSettings } from "@/lib/repository";
 
 type Props = {
@@ -23,6 +25,7 @@ export function generateMetadata({ params }: Props): Metadata {
   return {
     title: service.seo_title,
     description: service.seo_description,
+    alternates: buildAlternates(`/services/${service.slug}`),
     openGraph: {
       title: service.seo_title,
       description: service.seo_description,
@@ -54,7 +57,15 @@ export default function ServicePage({ params }: Props) {
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-8">
       <article className="glass glow rounded-3xl overflow-hidden">
-        <img src={service.image_url} alt={service.title} className="h-64 w-full object-cover md:h-80" decoding="async" fetchPriority="high" />
+        <Image
+          src={service.image_url}
+          alt={service.title}
+          width={1280}
+          height={720}
+          sizes="100vw"
+          priority
+          className="h-64 w-full object-cover md:h-80"
+        />
         <div className="p-6 md:p-8">
           <h1 className="text-3xl font-bold md:text-4xl">{service.title}</h1>
           <p className="mt-2 text-cyan-200 font-semibold">{service.price_from}</p>

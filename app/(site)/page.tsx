@@ -1,7 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
 import { MessengerCta } from "@/components/MessengerCta";
+import { PhoneLink } from "@/components/PhoneLink";
+import { buildAlternates } from "@/lib/seo";
 import { getPageContent, getSiteSettings, listPricing, listReviews, listServices } from "@/lib/repository";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +15,7 @@ export function generateMetadata(): Metadata {
   return {
     title: content.home_seo_title,
     description: content.home_seo_description,
+    alternates: buildAlternates("/"),
     openGraph: {
       title: content.home_seo_title,
       description: content.home_seo_description,
@@ -44,26 +48,46 @@ export default function HomePage() {
     }
   })();
 
+  const baseUrl = process.env.SITE_URL || "http://localhost:3000";
+
   const schema = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: settings.center_name,
-    telephone: settings.phone,
-    email: settings.email,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: settings.address
-    },
-    makesOffer: services.map((service) => ({
-      "@type": "Service",
-      name: service.title,
-      description: service.short_description,
-      offers: {
-        "@type": "Offer",
-        priceCurrency: "RUB",
-        priceSpecification: service.price_from
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: settings.center_name,
+        telephone: settings.phone,
+        email: settings.email,
+        url: baseUrl,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: settings.address
+        },
+        sameAs: [settings.whatsapp_url, settings.telegram_url].filter(Boolean)
+      },
+      {
+        "@type": ["LocalBusiness", "AutoRepair"],
+        name: settings.center_name,
+        telephone: settings.phone,
+        email: settings.email,
+        url: baseUrl,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: settings.address
+        },
+        openingHours: settings.work_hours,
+        makesOffer: services.map((service) => ({
+          "@type": "Service",
+          name: service.title,
+          description: service.short_description,
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "RUB",
+            priceSpecification: service.price_from
+          }
+        }))
       }
-    }))
+    ]
   };
 
   const faqSchema =
@@ -94,6 +118,9 @@ export default function HomePage() {
           <a href="#contact-form" className="primary-btn font-semibold">
             {content.hero_button_text}
           </a>
+          <Link href="/quiz" className="primary-btn font-semibold">
+            Пройти опрос
+          </Link>
           <Link href="/services" className="ghost-btn">
             Смотреть услуги
           </Link>
@@ -105,7 +132,14 @@ export default function HomePage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
             <article key={service.id} className="glass glow hover-lift rounded-2xl overflow-hidden">
-              <img src={service.image_url} alt={service.title} className="h-40 w-full object-cover" loading="lazy" decoding="async" />
+              <Image
+                src={service.image_url}
+                alt={service.title}
+                width={640}
+                height={360}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="h-40 w-full object-cover"
+              />
               <div className="p-4">
                 <h3 className="text-lg font-semibold">{service.title}</h3>
                 <p className="mt-2 text-sm text-slate-200">{service.short_description}</p>
@@ -186,7 +220,7 @@ export default function HomePage() {
         <article className="glass rounded-2xl p-6" id="contacts">
           <h2 className="text-2xl font-bold">Контакты</h2>
           <div className="mt-3 space-y-2 text-slate-200">
-            <p>Телефон: <a className="text-cyan-200" href={`tel:${settings.phone}`}>{settings.phone}</a></p>
+            <p>Телефон: <PhoneLink phone={settings.phone} className="text-cyan-200" source="home_contacts_phone">{settings.phone}</PhoneLink></p>
             <p>Email: <a className="text-cyan-200" href={`mailto:${settings.email}`}>{settings.email}</a></p>
             <p>Адрес: {settings.address}</p>
             <p>Часы работы: {settings.work_hours}</p>

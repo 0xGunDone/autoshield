@@ -26,13 +26,13 @@ function openDatabase(filePath: string): SqliteDatabase {
   };
 
   const database = new sqlite.DatabaseSync(filePath);
-  database.exec("PRAGMA journal_mode = WAL;");
   database.exec("PRAGMA busy_timeout = 8000;");
   return database;
 }
 
 const DATABASE_PATH = process.env.DATABASE_PATH || "./data/site.db";
 const resolvedPath = path.isAbsolute(DATABASE_PATH) ? DATABASE_PATH : path.join(process.cwd(), DATABASE_PATH);
+const INIT_LOCK_PATH = `${resolvedPath}.init.lock`;
 
 fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
 
@@ -48,6 +48,12 @@ const DEFAULT_SETTINGS = {
   telegram_bot_token: "",
   telegram_chat_id: "",
   metrika_id: "",
+  whatsapp_template:
+    "Здравствуйте, {name}! По вашему {car_brand} {car_model} ({car_year}) подготовили варианты по сигнализации. Удобно обсудить детали?",
+  telegram_template:
+    "Здравствуйте, {name}. По заявке #{id} для {car_brand} {car_model} ({car_year}) готовы предложить несколько решений. Написать кратко варианты?",
+  call_template:
+    "Добрый день, {name}. Это {center_name} по заявке #{id}. Уточняем задачу: {features}. Автомобиль {car_brand} {car_model} {car_year}. Удобно обсудить установку сейчас?",
   address: "Тверь, укажите адрес в админке",
   work_hours: "Пн-Сб: 09:00 - 19:00",
   map_iframe:
@@ -304,18 +310,58 @@ function sleepSync(ms: number): void {
   }
 }
 
-function withBusyRetry<T>(task: () => T, retries = 8): T {
+function withBusyRetry<T>(task: () => T, retries = 30): T {
   let attempt = 0;
 
   while (attempt < retries) {
     try {
       return task();
     } catch (error) {
-      const sqliteError = error as { code?: string };
-      if (sqliteError.code !== "SQLITE_BUSY" || attempt === retries - 1) {
+      const sqliteError = error as { code?: string; errcode?: number; errstr?: string; message?: string };
+      const text = `${sqliteError.message || ""} ${sqliteError.errstr || ""}`.toLowerCase();
+      const isBusy =
+        sqliteError.code === "SQLITE_BUSY" ||
+        sqliteError.errcode === 5 ||
+        sqliteError.errcode === 261 ||
+        text.includes("database is locked") ||
+        text.includes("sqlite_busy");
+
+      if (!isBusy || attempt === retries - 1) {
         throw error;
       }
-      sleepSync(80 * (attempt + 1));
+      const jitter = Math.floor(Math.random() * 90);
+      sleepSync(80 * (attempt + 1) + jitter);
+      attempt += 1;
+    }
+  }
+
+  return task();
+}
+
+function withInitLock<T>(task: () => T): T {
+  let attempt = 0;
+
+  while (attempt < 100) {
+    try {
+      const fd = fs.openSync(INIT_LOCK_PATH, "wx");
+
+      try {
+        return task();
+      } finally {
+        fs.closeSync(fd);
+        try {
+          fs.unlinkSync(INIT_LOCK_PATH);
+        } catch {
+          // ignore lock cleanup issues
+        }
+      }
+    } catch (error) {
+      const lockError = error as { code?: string };
+      if (lockError.code !== "EEXIST") {
+        throw error;
+      }
+
+      sleepSync(70 + Math.floor(Math.random() * 80));
       attempt += 1;
     }
   }
@@ -383,6 +429,7 @@ function createSchema(): void {
       selection_stage TEXT NOT NULL DEFAULT '',
       desired_slot TEXT NOT NULL DEFAULT '',
       status TEXT NOT NULL DEFAULT 'new',
+      sla_alert_sent_at TEXT NOT NULL DEFAULT '',
       service_id INTEGER,
       service_name TEXT NOT NULL,
       comment TEXT NOT NULL,
@@ -403,6 +450,9 @@ function createSchema(): void {
       telegram_bot_token TEXT NOT NULL DEFAULT '',
       telegram_chat_id TEXT NOT NULL DEFAULT '',
       metrika_id TEXT NOT NULL DEFAULT '',
+      whatsapp_template TEXT NOT NULL DEFAULT '',
+      telegram_template TEXT NOT NULL DEFAULT '',
+      call_template TEXT NOT NULL DEFAULT '',
       address TEXT NOT NULL,
       work_hours TEXT NOT NULL,
       map_iframe TEXT NOT NULL,
@@ -448,8 +498,9 @@ function addColumnIfMissing(
   try {
     db.exec(sql);
   } catch (error) {
-    const sqliteError = error as { code?: string; message?: string };
-    const isDuplicateColumn = sqliteError.code === "SQLITE_ERROR" && sqliteError.message?.toLowerCase().includes("duplicate column");
+    const sqliteError = error as { message?: string; errstr?: string };
+    const text = `${sqliteError.message || ""} ${sqliteError.errstr || ""}`.toLowerCase();
+    const isDuplicateColumn = text.includes("duplicate column");
 
     if (!isDuplicateColumn) {
       throw error;
@@ -471,6 +522,17 @@ function ensureSchemaColumns(): void {
     "ALTER TABLE site_settings ADD COLUMN telegram_chat_id TEXT NOT NULL DEFAULT ''"
   );
   addColumnIfMissing("site_settings", "metrika_id", "ALTER TABLE site_settings ADD COLUMN metrika_id TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(
+    "site_settings",
+    "whatsapp_template",
+    "ALTER TABLE site_settings ADD COLUMN whatsapp_template TEXT NOT NULL DEFAULT ''"
+  );
+  addColumnIfMissing(
+    "site_settings",
+    "telegram_template",
+    "ALTER TABLE site_settings ADD COLUMN telegram_template TEXT NOT NULL DEFAULT ''"
+  );
+  addColumnIfMissing("site_settings", "call_template", "ALTER TABLE site_settings ADD COLUMN call_template TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing("page_content", "faq_json", "ALTER TABLE page_content ADD COLUMN faq_json TEXT NOT NULL DEFAULT '[]'");
   addColumnIfMissing("contact_requests", "start_type", "ALTER TABLE contact_requests ADD COLUMN start_type TEXT NOT NULL DEFAULT ''");
   addColumnIfMissing(
@@ -499,6 +561,11 @@ function ensureSchemaColumns(): void {
     "ALTER TABLE contact_requests ADD COLUMN desired_slot TEXT NOT NULL DEFAULT ''"
   );
   addColumnIfMissing("contact_requests", "status", "ALTER TABLE contact_requests ADD COLUMN status TEXT NOT NULL DEFAULT 'new'");
+  addColumnIfMissing(
+    "contact_requests",
+    "sla_alert_sent_at",
+    "ALTER TABLE contact_requests ADD COLUMN sla_alert_sent_at TEXT NOT NULL DEFAULT ''"
+  );
 }
 
 function isLegacySeedData(): boolean {
@@ -522,17 +589,41 @@ function seedSettings(forceUpdate: boolean): void {
     `
     INSERT OR IGNORE INTO site_settings (
       id, center_name, phone, email, request_email, whatsapp_url, telegram_url,
-      telegram_bot_token, telegram_chat_id, metrika_id, address, work_hours, map_iframe,
+      telegram_bot_token, telegram_chat_id, metrika_id, whatsapp_template, telegram_template, call_template,
+      address, work_hours, map_iframe,
       default_seo_title, default_seo_description, smtp_host, smtp_port, smtp_secure,
       smtp_user, smtp_password, updated_at
     ) VALUES (
       1, @center_name, @phone, @email, @request_email, @whatsapp_url, @telegram_url,
-      @telegram_bot_token, @telegram_chat_id, @metrika_id, @address, @work_hours, @map_iframe,
+      @telegram_bot_token, @telegram_chat_id, @metrika_id, @whatsapp_template, @telegram_template, @call_template,
+      @address, @work_hours, @map_iframe,
       @default_seo_title, @default_seo_description, @smtp_host, @smtp_port, @smtp_secure,
       @smtp_user, @smtp_password, @updated_at
     )
     `
   ).run({ ...DEFAULT_SETTINGS, updated_at: timestamp });
+
+  db.prepare(
+    `
+    UPDATE site_settings
+    SET
+      whatsapp_template = @whatsapp_template,
+      telegram_template = @telegram_template,
+      call_template = @call_template,
+      updated_at = @updated_at
+    WHERE id = 1
+      AND (
+        whatsapp_template IS NULL OR TRIM(whatsapp_template) = ''
+        OR telegram_template IS NULL OR TRIM(telegram_template) = ''
+        OR call_template IS NULL OR TRIM(call_template) = ''
+      )
+    `
+  ).run({
+    whatsapp_template: DEFAULT_SETTINGS.whatsapp_template,
+    telegram_template: DEFAULT_SETTINGS.telegram_template,
+    call_template: DEFAULT_SETTINGS.call_template,
+    updated_at: timestamp
+  });
 
   if (forceUpdate) {
     db.prepare(
@@ -547,6 +638,9 @@ function seedSettings(forceUpdate: boolean): void {
         telegram_bot_token = @telegram_bot_token,
         telegram_chat_id = @telegram_chat_id,
         metrika_id = @metrika_id,
+        whatsapp_template = @whatsapp_template,
+        telegram_template = @telegram_template,
+        call_template = @call_template,
         address = @address,
         work_hours = @work_hours,
         map_iframe = @map_iframe,
@@ -749,6 +843,6 @@ function initDatabase(): void {
   seedReviews(legacySeedData);
 }
 
-withBusyRetry(() => initDatabase());
+withInitLock(() => withBusyRetry(() => initDatabase()));
 
 export { db, now };

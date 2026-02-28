@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/ContactForm";
 import { MessengerCta } from "@/components/MessengerCta";
+import { PhoneLink } from "@/components/PhoneLink";
+import { buildAlternates } from "@/lib/seo";
 import { getSiteSettings } from "@/lib/repository";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Контакты",
-  description: "Контакты центра установки охранных систем и дооснащения автомобилей в Твери."
+  description: "Контакты центра установки охранных систем и дооснащения автомобилей в Твери.",
+  alternates: buildAlternates("/contacts")
 };
 
 export default function ContactsPage() {
@@ -21,7 +24,7 @@ export default function ContactsPage() {
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="glass rounded-2xl p-6 space-y-2 text-slate-200">
-          <p><b>Телефон:</b> <a href={`tel:${settings.phone}`} className="text-cyan-200">{settings.phone}</a></p>
+          <p><b>Телефон:</b> <PhoneLink phone={settings.phone} className="text-cyan-200" source="contacts_phone">{settings.phone}</PhoneLink></p>
           <p><b>Email:</b> <a href={`mailto:${settings.email}`} className="text-cyan-200">{settings.email}</a></p>
           <p><b>Адрес:</b> {settings.address}</p>
           <p><b>Часы работы:</b> {settings.work_hours}</p>

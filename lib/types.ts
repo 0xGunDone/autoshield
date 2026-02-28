@@ -52,6 +52,7 @@ export type ContactRequest = {
   consent: number;
   ip: string;
   created_at: string;
+  sla_alert_sent_at: string;
 };
 
 export type SiteSettings = {
@@ -65,6 +66,9 @@ export type SiteSettings = {
   telegram_bot_token: string;
   telegram_chat_id: string;
   metrika_id: string;
+  whatsapp_template: string;
+  telegram_template: string;
+  call_template: string;
   address: string;
   work_hours: string;
   map_iframe: string;

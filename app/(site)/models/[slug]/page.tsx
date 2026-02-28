@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ContactForm } from "@/components/ContactForm";
 import { MessengerCta } from "@/components/MessengerCta";
 import { findServiceModelPageBySlug } from "@/lib/model-pages";
+import { buildAlternates } from "@/lib/seo";
 import { getSiteSettings, listServices } from "@/lib/repository";
 
 type Props = {
@@ -26,6 +28,7 @@ export function generateMetadata({ params }: Props): Metadata {
   return {
     title,
     description,
+    alternates: buildAlternates(`/models/${modelPage.slug}`),
     openGraph: {
       title,
       description,
@@ -76,7 +79,14 @@ export default function ModelPage({ params }: Props) {
       <section className="grid gap-4 md:grid-cols-2">
         {modelPage.services.map((service) => (
           <article key={service.id} className="glass hover-lift rounded-2xl overflow-hidden">
-            <img src={service.image_url} alt={service.title} className="h-44 w-full object-cover" loading="lazy" decoding="async" />
+            <Image
+              src={service.image_url}
+              alt={service.title}
+              width={640}
+              height={360}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="h-44 w-full object-cover"
+            />
             <div className="p-4">
               <h2 className="text-lg font-semibold">{service.title}</h2>
               <p className="mt-2 text-sm text-slate-200">{service.short_description}</p>

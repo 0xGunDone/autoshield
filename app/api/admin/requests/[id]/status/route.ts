@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ensureAdminOrReject } from "@/lib/admin-route";
 import { isJsonRequest, redirectTo } from "@/lib/api";
 import { ensureBodySize, HttpError, parseJsonBody } from "@/lib/http";
+import { logApiError } from "@/lib/logger";
 import { getContactRequestById, updateContactRequestStatus } from "@/lib/repository";
 
 export const runtime = "nodejs";
@@ -62,6 +63,7 @@ export async function POST(request: Request, { params }: Params) {
       return redirectTo(request, "/admin/requests", { error: "validation" });
     }
 
+    logApiError("api/admin/requests/status", error, { id, jsonRequest });
     if (jsonRequest) {
       return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }

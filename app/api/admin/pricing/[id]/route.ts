@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ensureAdminOrReject } from "@/lib/admin-route";
 import { isJsonRequest, redirectTo } from "@/lib/api";
 import { ensureBodySize, HttpError, parseJsonBody } from "@/lib/http";
+import { logApiError } from "@/lib/logger";
 import { deletePricing, getPricingById, updatePricing } from "@/lib/repository";
 import { pricingSchema } from "@/lib/validators";
 
@@ -54,7 +55,8 @@ export async function POST(request: Request, { params }: Params) {
     });
 
     return redirectTo(request, "/admin/pricing", { saved: "1" });
-  } catch {
+  } catch (error) {
+    logApiError("api/admin/pricing:update-form", error, { id });
     return redirectTo(request, `/admin/pricing/${id}/edit`, { error: "save" });
   }
 }
@@ -87,6 +89,7 @@ export async function PATCH(request: Request, { params }: Params) {
       return NextResponse.json({ message: error.message }, { status: error.status });
     }
 
+    logApiError("api/admin/pricing:update-json", error, { id });
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

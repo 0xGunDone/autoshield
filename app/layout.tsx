@@ -21,6 +21,12 @@ export function generateMetadata(): Metadata {
       template: `%s | ${settings.center_name}`
     },
     description: settings.default_seo_description,
+    alternates: {
+      canonical: "/",
+      languages: {
+        "ru-RU": "/"
+      }
+    },
     icons: {
       icon: "/icon.svg",
       shortcut: "/icon.svg",

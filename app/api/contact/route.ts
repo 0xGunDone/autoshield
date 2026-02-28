@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getClientIp, HttpError, parseJsonBody } from "@/lib/http";
+import { logApiError } from "@/lib/logger";
 import { sendContactRequestEmail, sendTelegramRequestNotification } from "@/lib/mailer";
 import { rateLimit } from "@/lib/rate-limit";
 import { createContactRequest, getContactRequestById } from "@/lib/repository";
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: error.message }, { status: error.status });
     }
 
+    logApiError("api/contact", error, { ip });
     return NextResponse.json({ message: "Внутренняя ошибка сервера" }, { status: 500 });
   }
 }

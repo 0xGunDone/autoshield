@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ensureAdminOrReject } from "@/lib/admin-route";
 import { isJsonRequest, redirectTo } from "@/lib/api";
 import { HttpError, parseFormBody, parseJsonBody } from "@/lib/http";
+import { logApiError } from "@/lib/logger";
 import { countSlug, createService } from "@/lib/repository";
 import { slugify } from "@/lib/slug";
 import { serviceSchema } from "@/lib/validators";
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
       return redirectTo(request, "/admin/services/new", { error: error.message });
     }
 
+    logApiError("api/admin/services:create", error, { jsonRequest });
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

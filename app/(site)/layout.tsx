@@ -12,7 +12,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     <>
       <SiteHeader phone={settings.phone} />
       <main className="pb-24 md:pb-0">{children}</main>
-      <MobileStickyCta />
+      <MobileStickyCta phone={settings.phone} />
       <SiteFooter address={settings.address} workHours={settings.work_hours} />
     </>
   );

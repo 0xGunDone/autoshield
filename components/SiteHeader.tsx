@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PhoneLink } from "@/components/PhoneLink";
 import { ShieldLogo } from "@/components/ShieldLogo";
 
 type Props = {
@@ -7,8 +8,10 @@ type Props = {
 
 const links = [
   { href: "/", label: "Главная" },
+  { href: "/quiz", label: "Опрос" },
   { href: "/services", label: "Услуги" },
   { href: "/models", label: "Модели" },
+  { href: "/cars", label: "Автомобили" },
   { href: "/pricing", label: "Цены" },
   { href: "/contacts", label: "Контакты" }
 ];
@@ -34,9 +37,9 @@ export function SiteHeader({ phone }: Props) {
               </Link>
             ))}
           </nav>
-          <a href={`tel:${phone}`} className="primary-btn text-sm font-semibold">
+          <PhoneLink phone={phone} className="primary-btn text-sm font-semibold" source="header_phone">
             {phone}
-          </a>
+          </PhoneLink>
         </div>
       </div>
     </header>

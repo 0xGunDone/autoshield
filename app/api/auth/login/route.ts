@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { isJsonRequest, redirectTo } from "@/lib/api";
 import { getClientIp, HttpError, parseFormBody, parseJsonBody } from "@/lib/http";
 import { AUTH_COOKIE, signJwt } from "@/lib/jwt";
+import { logApiError } from "@/lib/logger";
 import { rateLimit } from "@/lib/rate-limit";
 import { getAdminByLogin } from "@/lib/repository";
 import { loginSchema } from "@/lib/validators";
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
       return redirectTo(request, "/admin/login", { error: "validation" });
     }
 
+    logApiError("api/auth/login", error, { ip, jsonRequest });
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

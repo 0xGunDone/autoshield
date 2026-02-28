@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { sendMetrikaGoal } from "@/lib/metrika-client";
 
 type Feature = "autostart" | "remote" | "phone" | "gsm" | "gps" | "unsure";
 type StartType = "button" | "key";
@@ -51,29 +52,7 @@ const featureOptions: Array<{ value: Feature; label: string }> = [
   { value: "unsure", label: "Затрудняюсь" }
 ];
 
-declare global {
-  interface Window {
-    ym?: (...args: unknown[]) => void;
-  }
-}
-
-function sendMetrikaGoal(goal: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined" || typeof window.ym !== "function") {
-    return;
-  }
-
-  const metrikaId = document.documentElement.getAttribute("data-metrika-id") || "";
-  if (!metrikaId.trim()) {
-    return;
-  }
-
-  const counterId = Number(metrikaId);
-  if (!Number.isFinite(counterId)) {
-    return;
-  }
-
-  window.ym(counterId, "reachGoal", goal, params || {});
-}
+const QUIZ_STORAGE_KEY = "autoshield69_quiz_v1";
 
 export function ContactForm() {
   const [step, setStep] = useState(1);
@@ -83,6 +62,49 @@ export function ContactForm() {
   const [stepError, setStepError] = useState<string>("");
 
   const progress = useMemo(() => Math.round((step / totalSteps) * 100), [step]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const raw = window.localStorage.getItem(QUIZ_STORAGE_KEY);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as { step?: number; form?: Partial<FormState> };
+      if (parsed.form && typeof parsed.form === "object") {
+        setForm((current) => ({
+          ...current,
+          ...parsed.form,
+          honeypot: ""
+        }));
+      }
+      if (parsed.step && Number.isInteger(parsed.step) && parsed.step >= 1 && parsed.step <= totalSteps) {
+        setStep(parsed.step);
+      }
+    } catch {
+      window.localStorage.removeItem(QUIZ_STORAGE_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const payload = {
+      step,
+      form: {
+        ...form,
+        honeypot: ""
+      }
+    };
+
+    window.localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(payload));
+  }, [form, step]);
 
   function validateCurrentStep(): string | null {
     if (step === 1) {
@@ -192,6 +214,9 @@ export function ContactForm() {
       } else {
         setForm(initialState);
         setStep(1);
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem(QUIZ_STORAGE_KEY);
+        }
         setStatus("Анкета отправлена. Мы свяжемся с вами для подбора сигнализации.");
         sendMetrikaGoal("quiz_submit_success");
       }

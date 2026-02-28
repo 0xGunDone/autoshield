@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ensureAdminOrReject } from "@/lib/admin-route";
 import { isJsonRequest, redirectTo } from "@/lib/api";
 import { ensureBodySize, HttpError, parseJsonBody } from "@/lib/http";
+import { logApiError } from "@/lib/logger";
 import { deleteReview, getReviewById, updateReview } from "@/lib/repository";
 import { reviewSchema } from "@/lib/validators";
 
@@ -53,7 +54,8 @@ export async function POST(request: Request, { params }: Params) {
     });
 
     return redirectTo(request, "/admin/reviews", { saved: "1" });
-  } catch {
+  } catch (error) {
+    logApiError("api/admin/reviews:update-form", error, { id });
     return redirectTo(request, `/admin/reviews/${id}/edit`, { error: "save" });
   }
 }
@@ -85,6 +87,7 @@ export async function PATCH(request: Request, { params }: Params) {
       return NextResponse.json({ message: error.message }, { status: error.status });
     }
 
+    logApiError("api/admin/reviews:update-json", error, { id });
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

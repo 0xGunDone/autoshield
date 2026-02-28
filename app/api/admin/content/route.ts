@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ensureAdminOrReject } from "@/lib/admin-route";
 import { isJsonRequest, redirectTo } from "@/lib/api";
 import { HttpError, parseFormBody, parseJsonBody } from "@/lib/http";
+import { logApiError } from "@/lib/logger";
 import { updatePageContent } from "@/lib/repository";
 import { contentSchema } from "@/lib/validators";
 
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
       return redirectTo(request, "/admin/content", { error: "validation" });
     }
 
+    logApiError("api/admin/content", error, { jsonRequest });
     return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

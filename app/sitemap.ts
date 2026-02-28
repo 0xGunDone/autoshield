@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { listCarPages } from "@/lib/car-pages";
 import { buildServiceModelPages } from "@/lib/model-pages";
 import { listServices } from "@/lib/repository";
 
@@ -9,11 +10,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const services = listServices();
   const modelPages = buildServiceModelPages(services);
+  const carPages = listCarPages();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
+    { url: `${baseUrl}/quiz`, lastModified: now, changeFrequency: "weekly", priority: 0.95 },
     { url: `${baseUrl}/services`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${baseUrl}/models`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
+    { url: `${baseUrl}/cars`, lastModified: now, changeFrequency: "weekly", priority: 0.84 },
     { url: `${baseUrl}/pricing`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/contacts`, lastModified: now, changeFrequency: "monthly", priority: 0.8 }
   ];
@@ -32,5 +36,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.72
   }));
 
-  return [...staticRoutes, ...serviceRoutes, ...modelRoutes];
+  const carRoutes = carPages.map((car) => ({
+    url: `${baseUrl}/cars/${car.brandSlug}/${car.modelSlug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.73
+  }));
+
+  return [...staticRoutes, ...serviceRoutes, ...modelRoutes, ...carRoutes];
 }

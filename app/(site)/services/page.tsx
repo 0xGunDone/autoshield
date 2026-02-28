@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
+import { buildAlternates } from "@/lib/seo";
 import { listServices } from "@/lib/repository";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +9,8 @@ export const dynamic = "force-dynamic";
 export function generateMetadata(): Metadata {
   return {
     title: "Услуги",
-    description: "Установка сигнализаций, автозапуска, иммобилайзеров, GSM/GPS и дооснащение автомобилей в Твери."
+    description: "Установка сигнализаций, автозапуска, иммобилайзеров, GSM/GPS и дооснащение автомобилей в Твери.",
+    alternates: buildAlternates("/services")
   };
 }
 
@@ -24,7 +27,14 @@ export default function ServicesPage() {
       <section className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {services.map((service) => (
           <article key={service.id} className="glass hover-lift rounded-2xl overflow-hidden">
-            <img src={service.image_url} alt={service.title} className="h-44 w-full object-cover" loading="lazy" decoding="async" />
+            <Image
+              src={service.image_url}
+              alt={service.title}
+              width={640}
+              height={360}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="h-44 w-full object-cover"
+            />
             <div className="p-4">
               <h2 className="text-lg font-semibold">{service.title}</h2>
               <p className="mt-2 text-sm text-slate-200">{service.short_description}</p>
