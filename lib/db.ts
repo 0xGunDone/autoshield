@@ -1,14 +1,42 @@
 import bcrypt from "bcrypt";
-import Database from "better-sqlite3";
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
+
+type SqliteRunResult = {
+  lastInsertRowid?: number | bigint;
+};
+
+type SqliteStatement = {
+  run: (...params: unknown[]) => SqliteRunResult;
+  get: (...params: unknown[]) => unknown;
+  all: (...params: unknown[]) => unknown[];
+};
+
+type SqliteDatabase = {
+  exec: (sql: string) => void;
+  prepare: (sql: string) => SqliteStatement;
+};
+
+const nodeRequire = createRequire(import.meta.url);
+
+function openDatabase(filePath: string): SqliteDatabase {
+  const sqlite = nodeRequire("node:sqlite") as {
+    DatabaseSync: new (location: string) => SqliteDatabase;
+  };
+
+  const database = new sqlite.DatabaseSync(filePath);
+  database.exec("PRAGMA journal_mode = WAL;");
+  database.exec("PRAGMA busy_timeout = 8000;");
+  return database;
+}
 
 const DATABASE_PATH = process.env.DATABASE_PATH || "./data/site.db";
 const resolvedPath = path.isAbsolute(DATABASE_PATH) ? DATABASE_PATH : path.join(process.cwd(), DATABASE_PATH);
 
 fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
 
-const db = new Database(resolvedPath, { timeout: 8000 });
+const db = openDatabase(resolvedPath);
 
 const DEFAULT_SETTINGS = {
   center_name: "Центр охранных систем",
@@ -721,7 +749,6 @@ function initDatabase(): void {
   seedReviews(legacySeedData);
 }
 
-withBusyRetry(() => db.pragma("journal_mode = WAL"));
 withBusyRetry(() => initDatabase());
 
 export { db, now };

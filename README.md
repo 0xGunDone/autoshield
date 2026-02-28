@@ -6,7 +6,7 @@
 
 - Next.js (App Router)
 - TypeScript
-- SQLite + better-sqlite3
+- SQLite (встроенный `node:sqlite`, без нативной сборки)
 - JWT (HTTP-only cookie)
 - bcrypt
 - TailwindCSS
@@ -14,6 +14,8 @@
 - Zod
 
 Без ORM, без Docker.
+
+Требование к Node.js: `>=22` (рекомендовано `24.x`).
 
 ## Что реализовано
 
