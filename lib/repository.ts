@@ -198,6 +198,30 @@ export function listContactRequests(): ContactRequest[] {
   return db.prepare("SELECT * FROM contact_requests ORDER BY created_at DESC").all() as ContactRequest[];
 }
 
+export function countContactRequestsByStatus(): { new: number; in_progress: number; closed: number } {
+  const row = db
+    .prepare(
+      `
+      SELECT
+        SUM(CASE WHEN status = 'new' THEN 1 ELSE 0 END) as new_count,
+        SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
+        SUM(CASE WHEN status = 'closed' THEN 1 ELSE 0 END) as closed_count
+      FROM contact_requests
+      `
+    )
+    .get() as {
+      new_count: number | null;
+      in_progress_count: number | null;
+      closed_count: number | null;
+    };
+
+  return {
+    new: row.new_count || 0,
+    in_progress: row.in_progress_count || 0,
+    closed: row.closed_count || 0
+  };
+}
+
 export function listContactRequestsFiltered(params: { status?: "all" | "new" | "in_progress" | "closed"; query?: string }): ContactRequest[] {
   const clauses: string[] = [];
   const values: unknown[] = [];

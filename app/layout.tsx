@@ -43,6 +43,7 @@ export function generateMetadata(): Metadata {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const settings = getSiteSettings();
   const metrikaId = settings.metrika_id?.trim() || "";
+  const metrikaCounter = metrikaId ? Number(metrikaId) : 0;
 
   return (
     <html lang="ru" data-metrika-id={metrikaId || undefined}>
@@ -53,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
       <body>
-        {metrikaId ? (
+        {metrikaId && Number.isFinite(metrikaCounter) && metrikaCounter > 0 ? (
           <>
             <Script id="yandex-metrika" strategy="afterInteractive">
               {`
@@ -62,7 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
                 k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
                 (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-                ym(${JSON.stringify(metrikaId)}, "init", {
+                ym(${metrikaCounter}, "init", {
                   clickmap:true,
                   trackLinks:true,
                   accurateTrackBounce:true,

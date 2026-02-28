@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/AdminShell";
 import { requireAdminPage } from "@/lib/auth";
-import { listContactRequests, listPricing, listReviews, listServices } from "@/lib/repository";
+import { countContactRequestsByStatus, listContactRequests, listPricing, listReviews, listServices } from "@/lib/repository";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +12,7 @@ export default async function AdminDashboardPage() {
   const pricingCount = listPricing().length;
   const reviewsCount = listReviews().length;
   const requestsCount = listContactRequests().length;
+  const requestStatus = countContactRequestsByStatus();
 
   return (
     <AdminShell title="Панель управления">
@@ -31,6 +32,9 @@ export default async function AdminDashboardPage() {
         <article className="glass rounded-xl p-4">
           <p className="text-sm text-slate-300">Заявки</p>
           <p className="mt-2 text-2xl font-bold">{requestsCount}</p>
+          <p className="mt-2 text-xs text-slate-400">
+            Новые: {requestStatus.new} · В работе: {requestStatus.in_progress} · Закрыто: {requestStatus.closed}
+          </p>
         </article>
       </div>
 

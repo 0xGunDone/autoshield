@@ -44,7 +44,11 @@ export const settingsSchema = z.object({
   telegram_url: optionalUrlSchema,
   telegram_bot_token: z.string().max(180).default(""),
   telegram_chat_id: z.string().max(180).default(""),
-  metrika_id: z.string().max(30).default(""),
+  metrika_id: z
+    .string()
+    .max(30)
+    .default("")
+    .refine((value) => !value || /^\d+$/.test(value), "ID Метрики должен содержать только цифры"),
   address: z.string().min(4).max(220),
   work_hours: z.string().min(4).max(180),
   map_iframe: z.string().max(3000).default(""),
