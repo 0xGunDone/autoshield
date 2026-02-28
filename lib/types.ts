@@ -38,6 +38,7 @@ export type ContactRequest = {
   car_brand: string;
   car_model: string;
   car_year: number;
+  gearbox: string;
   start_type: string;
   is_under_warranty: number;
   features_json: string;

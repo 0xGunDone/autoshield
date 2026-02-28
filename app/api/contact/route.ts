@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { getClientIp, HttpError, parseJsonBody } from "@/lib/http";
 import { logApiError } from "@/lib/logger";
-import { sendContactRequestEmail, sendTelegramRequestNotification } from "@/lib/mailer";
+import {
+  sendContactRequestEmail,
+  sendTelegramRequestNotification,
+} from "@/lib/mailer";
 import { rateLimit } from "@/lib/rate-limit";
 import { createContactRequest, getContactRequestById } from "@/lib/repository";
 import { contactRequestSchema } from "@/lib/validators";
@@ -12,7 +15,10 @@ export async function POST(request: Request) {
   const ip = getClientIp(request);
 
   if (!rateLimit(`contact:${ip}`, 5, 10 * 60 * 1000)) {
-    return NextResponse.json({ message: "Слишком много запросов. Попробуйте позже." }, { status: 429 });
+    return NextResponse.json(
+      { message: "Слишком много запросов. Попробуйте позже." },
+      { status: 429 },
+    );
   }
 
   try {
@@ -29,6 +35,7 @@ export async function POST(request: Request) {
       car_brand: payload.car_brand,
       car_model: payload.car_model,
       car_year: payload.car_year,
+      gearbox: payload.gearbox,
       start_type: payload.start_type,
       is_under_warranty: payload.is_under_warranty === "yes" ? 1 : 0,
       features_json: JSON.stringify(payload.features),
@@ -41,7 +48,7 @@ export async function POST(request: Request) {
       comment: "",
       needs_autostart: hasAutostart ? 1 : 0,
       consent: 1,
-      ip
+      ip,
     });
 
     const savedRequest = getContactRequestById(requestId);
@@ -62,10 +69,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, message: "Заявка принята" });
   } catch (error) {
     if (error instanceof HttpError) {
-      return NextResponse.json({ message: error.message }, { status: error.status });
+      return NextResponse.json(
+        { message: error.message },
+        { status: error.status },
+      );
     }
 
     logApiError("api/contact", error, { ip });
-    return NextResponse.json({ message: "Внутренняя ошибка сервера" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Внутренняя ошибка сервера" },
+      { status: 500 },
+    );
   }
 }

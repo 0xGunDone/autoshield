@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/AdminShell";
+import { ImageUploader } from "@/components/ImageUploader";
 import { requireAdminPage } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,11 @@ export default async function NewServicePage() {
 
   return (
     <AdminShell title="Новая услуга">
-      <form action="/api/admin/services" method="post" className="glass rounded-2xl p-5 space-y-4">
+      <form
+        action="/api/admin/services"
+        method="post"
+        className="glass rounded-2xl p-5 space-y-4"
+      >
         <input type="hidden" name="_action" value="create" />
 
         <div>
@@ -32,8 +37,10 @@ export default async function NewServicePage() {
             <input name="price_from" required placeholder="от 10 000 ₽" />
           </div>
           <div>
-            <label className="mb-1 block text-sm">Изображение (URL)</label>
-            <input name="image_url" required placeholder="https://..." />
+            <label className="mb-1 block text-sm">
+              Изображение (URL или файл)
+            </label>
+            <ImageUploader name="image_url" />
           </div>
         </div>
 
@@ -48,7 +55,9 @@ export default async function NewServicePage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm">Slug (необязательно, автогенерация)</label>
+          <label className="mb-1 block text-sm">
+            Slug (необязательно, автогенерация)
+          </label>
           <input name="slug" placeholder="ustanovka-signalizacii" />
         </div>
 

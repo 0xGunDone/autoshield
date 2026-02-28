@@ -31,7 +31,9 @@ function openDatabase(filePath: string): SqliteDatabase {
 }
 
 const DATABASE_PATH = process.env.DATABASE_PATH || "./data/site.db";
-const resolvedPath = path.isAbsolute(DATABASE_PATH) ? DATABASE_PATH : path.join(process.cwd(), DATABASE_PATH);
+const resolvedPath = path.isAbsolute(DATABASE_PATH)
+  ? DATABASE_PATH
+  : path.join(process.cwd(), DATABASE_PATH);
 const INIT_LOCK_PATH = `${resolvedPath}.init.lock`;
 
 fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
@@ -65,14 +67,14 @@ const DEFAULT_SETTINGS = {
   smtp_port: 465,
   smtp_secure: 1,
   smtp_user: "",
-  smtp_password: ""
+  smtp_password: "",
 };
 
 const COPIED_CONTACT_DEFAULTS = {
   phone: "+7-920-157-0546",
   email: "info@starline69.ru",
   request_email: "info@starline69.ru",
-  address: "г. Тверь, ул. 1-я за линией Октябрьской ж/д, ст. 1В"
+  address: "г. Тверь, ул. 1-я за линией Октябрьской ж/д, ст. 1В",
 };
 
 const DEFAULT_CONTENT = {
@@ -84,27 +86,30 @@ const DEFAULT_CONTENT = {
     "100% клиентоориентированность",
     "Официальный центр StarLine",
     "Высокий уровень сервиса",
-    "Гарантия на установку и оборудование"
+    "Гарантия на установку и оборудование",
   ]),
   faq_json: JSON.stringify([
     {
       question: "Сколько занимает установка охранного комплекса?",
-      answer: "Обычно от 4 до 8 часов в зависимости от автомобиля и выбранной системы."
+      answer:
+        "Обычно от 4 до 8 часов в зависимости от автомобиля и выбранной системы.",
     },
     {
       question: "Можно ли сохранить гарантию на новый автомобиль?",
-      answer: "Да, при корректной установке и оформлении документов гарантия на авто сохраняется."
+      answer:
+        "Да, при корректной установке и оформлении документов гарантия на авто сохраняется.",
     },
     {
       question: "Есть ли поддержка после установки?",
-      answer: "Да, мы помогаем с настройкой приложения, консультациями и сервисным сопровождением."
-    }
+      answer:
+        "Да, мы помогаем с настройкой приложения, консультациями и сервисным сопровождением.",
+    },
   ]),
   about_text:
     "Работаем с легковым и коммерческим транспортом, подбираем решения под задачи владельца и особенности автомобиля. По данным starline69.ru доступны комплексы серии A, S, E, T и B с установкой в Твери.",
   home_seo_title: "StarLine69 Тверь - установка сигнализаций и автозапуска",
   home_seo_description:
-    "Цены на комплексы StarLine в Твери: A63, A93, S96, E96 и другие. Официальная установка, поддержка и гарантия."
+    "Цены на комплексы StarLine в Твери: A63, A93, S96, E96 и другие. Официальная установка, поддержка и гарантия.",
 };
 
 type ServiceSeed = {
@@ -121,125 +126,158 @@ type ServiceSeed = {
 const STARLINE_SERVICE_SEEDS: ServiceSeed[] = [
   {
     title: "StarLine A63 v2",
-    short_description: "Базовый охранный комплекс с надежной диалоговой защитой и удобным управлением.",
+    short_description:
+      "Базовый охранный комплекс с надежной диалоговой защитой и удобным управлением.",
     description:
       "Линейка A63 v2 подходит для ежедневной защиты автомобиля. На starline69.ru представлены варианты ECO, v2, 2CAN+2LIN ECO и LTE ECO.",
     price_from: "от 9 150 ₽",
-    image_url: "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1583267746897-2cf415887172?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine A63 v2 в Твери - установка от 9 150 ₽",
-    seo_description: "Установка StarLine A63 v2, ECO и LTE ECO в Твери. Официальный монтаж и гарантия.",
-    slug: "starline-a63-v2"
+    seo_description:
+      "Установка StarLine A63 v2, ECO и LTE ECO в Твери. Официальный монтаж и гарантия.",
+    slug: "starline-a63-v2",
   },
   {
     title: "StarLine A93 v2",
-    short_description: "Популярный комплекс с автозапуском и расширенными CAN/LIN конфигурациями.",
+    short_description:
+      "Популярный комплекс с автозапуском и расширенными CAN/LIN конфигурациями.",
     description:
       "Серия A93 v2 включает конфигурации ECO, 2CAN+2LIN и LTE. Решение для владельцев, которым важен удаленный запуск и стабильная защита.",
     price_from: "от 11 800 ₽",
-    image_url: "https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine A93 v2 в Твери - установка от 11 800 ₽",
-    seo_description: "Официальная установка StarLine A93 v2, LTE и 2CAN+2LIN в Твери.",
-    slug: "starline-a93-v2"
+    seo_description:
+      "Официальная установка StarLine A93 v2, LTE и 2CAN+2LIN в Твери.",
+    slug: "starline-a93-v2",
   },
   {
     title: "StarLine A90 BT",
-    short_description: "Современная сигнализация с Bluetooth-авторизацией и автозапуском.",
+    short_description:
+      "Современная сигнализация с Bluetooth-авторизацией и автозапуском.",
     description:
       "Комплекс A90 BT повышает удобство управления и уровень противоугонной защиты. Подходит для городской и трассовой эксплуатации.",
     price_from: "от 13 500 ₽",
-    image_url: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine A90 BT в Твери - установка от 13 500 ₽",
-    seo_description: "Установка StarLine A90 BT в Твери у официального установочного центра.",
-    slug: "starline-a90-bt"
+    seo_description:
+      "Установка StarLine A90 BT в Твери у официального установочного центра.",
+    slug: "starline-a90-bt",
   },
   {
     title: "StarLine S66 v2",
-    short_description: "GSM-комплекс с управлением через приложение и интеграцией в штатные системы.",
+    short_description:
+      "GSM-комплекс с управлением через приложение и интеграцией в штатные системы.",
     description:
       "Варианты S66 v2 (Mini, ECO, LTE) рассчитаны на владельцев, которым нужен удаленный контроль автомобиля и тревожные уведомления.",
     price_from: "от 14 900 ₽",
-    image_url: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine S66 v2 в Твери - установка от 14 900 ₽",
-    seo_description: "Монтаж StarLine S66 v2 Mini, ECO и LTE в Твери. Настройка приложения и телематики.",
-    slug: "starline-s66-v2"
+    seo_description:
+      "Монтаж StarLine S66 v2 Mini, ECO и LTE в Твери. Настройка приложения и телематики.",
+    slug: "starline-s66-v2",
   },
   {
     title: "StarLine E66 v2",
-    short_description: "Комплекс среднего класса с усиленной защитой и GSM-функциями.",
+    short_description:
+      "Комплекс среднего класса с усиленной защитой и GSM-функциями.",
     description:
       "Серия E66 v2 доступна в вариантах ECO и GSM ECO. Подходит для установки с учетом современных цифровых шин автомобиля.",
     price_from: "от 15 450 ₽",
-    image_url: "https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine E66 v2 в Твери - установка от 15 450 ₽",
-    seo_description: "Установка StarLine E66 v2 и GSM ECO в Твери. Сертифицированный монтаж.",
-    slug: "starline-e66-v2"
+    seo_description:
+      "Установка StarLine E66 v2 и GSM ECO в Твери. Сертифицированный монтаж.",
+    slug: "starline-e66-v2",
   },
   {
     title: "StarLine E96 v2",
-    short_description: "Продвинутый охранно-телематический комплекс с GPS/GSM конфигурациями.",
+    short_description:
+      "Продвинутый охранно-телематический комплекс с GPS/GSM конфигурациями.",
     description:
       "Линейка E96 v2 включает варианты ECO, GSM, GSM GPS и GSM GPS PRO. Решение для контроля автомобиля в режиме реального времени.",
     price_from: "от 18 150 ₽",
-    image_url: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine E96 v2 в Твери - установка от 18 150 ₽",
-    seo_description: "Монтаж StarLine E96 v2 с GSM/GPS в Твери. Полная настройка телематических функций.",
-    slug: "starline-e96-v2"
+    seo_description:
+      "Монтаж StarLine E96 v2 с GSM/GPS в Твери. Полная настройка телематических функций.",
+    slug: "starline-e96-v2",
   },
   {
     title: "StarLine E97",
-    short_description: "Система с поддержкой CAN FD и расширенными противоугонными возможностями.",
+    short_description:
+      "Система с поддержкой CAN FD и расширенными противоугонными возможностями.",
     description:
       "E97 рассчитан на современные автомобили с новыми цифровыми шинами, включая конфигурации CAN FD GSM GPS.",
     price_from: "от 20 650 ₽",
-    image_url: "https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine E97 в Твери - установка от 20 650 ₽",
-    seo_description: "Установка StarLine E97 и E97 CAN FD GSM GPS в Твери у официального партнера.",
-    slug: "starline-e97"
+    seo_description:
+      "Установка StarLine E97 и E97 CAN FD GSM GPS в Твери у официального партнера.",
+    slug: "starline-e97",
   },
   {
     title: "StarLine S96 v2",
-    short_description: "Флагманская линейка с LTE/GPS и гибкими конфигурациями безопасности.",
+    short_description:
+      "Флагманская линейка с LTE/GPS и гибкими конфигурациями безопасности.",
     description:
       "S96 v2 доступен в версиях ECO, LTE, GPS и PRO. Комплекс для владельцев, которым нужна максимальная функциональность и контроль.",
     price_from: "от 19 450 ₽",
-    image_url: "https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine S96 v2 в Твери - установка от 19 450 ₽",
-    seo_description: "StarLine S96 v2 LTE/GPS/PRO в Твери. Профессиональная установка и настройка.",
-    slug: "starline-s96-v2"
+    seo_description:
+      "StarLine S96 v2 LTE/GPS/PRO в Твери. Профессиональная установка и настройка.",
+    slug: "starline-s96-v2",
   },
   {
     title: "StarLine T94 v2",
-    short_description: "Решение для усиленной охраны с акцентом на надежность и устойчивость к помехам.",
+    short_description:
+      "Решение для усиленной охраны с акцентом на надежность и устойчивость к помехам.",
     description:
       "T94 v2 ориентирован на автомобили, требующие стабильной работы в сложных условиях эксплуатации.",
     price_from: "от 23 500 ₽",
-    image_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine T94 v2 в Твери - установка от 23 500 ₽",
-    seo_description: "Установка StarLine T94 v2 в Твери. Консультация, монтаж, гарантия.",
-    slug: "starline-t94-v2"
+    seo_description:
+      "Установка StarLine T94 v2 в Твери. Консультация, монтаж, гарантия.",
+    slug: "starline-t94-v2",
   },
   {
     title: "StarLine S97 CAN FD GPS",
-    short_description: "Комплекс для автомобилей с CAN FD с точным GPS-контролем.",
+    short_description:
+      "Комплекс для автомобилей с CAN FD с точным GPS-контролем.",
     description:
       "S97 CAN FD GPS сочетает противоугонные функции и спутниковый мониторинг, подходит для новых платформ авто.",
     price_from: "от 25 450 ₽",
-    image_url: "https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine S97 CAN FD GPS в Твери - установка от 25 450 ₽",
-    seo_description: "Монтаж StarLine S97 CAN FD GPS в Твери. Настройка и гарантийная поддержка.",
-    slug: "starline-s97-can-fd-gps"
+    seo_description:
+      "Монтаж StarLine S97 CAN FD GPS в Твери. Настройка и гарантийная поддержка.",
+    slug: "starline-s97-can-fd-gps",
   },
   {
     title: "StarLine B97 v2 3CAN+FD+4LIN LTE",
-    short_description: "Премиальный комплекс для сложных интеграций и максимальной защиты.",
+    short_description:
+      "Премиальный комплекс для сложных интеграций и максимальной защиты.",
     description:
       "B97 v2 рассчитан на комплексные проекты с расширенной цифровой интеграцией и LTE-каналом управления.",
     price_from: "от 47 300 ₽",
-    image_url: "https://images.unsplash.com/photo-1556800572-1b8aeef2c54f?auto=format&fit=crop&w=1200&q=80",
+    image_url:
+      "https://images.unsplash.com/photo-1556800572-1b8aeef2c54f?auto=format&fit=crop&w=1200&q=80",
     seo_title: "StarLine B97 v2 в Твери - установка от 47 300 ₽",
-    seo_description: "Премиальная установка StarLine B97 v2 3CAN+FD+4LIN LTE в Твери.",
-    slug: "starline-b97-v2-lte"
-  }
+    seo_description:
+      "Премиальная установка StarLine B97 v2 3CAN+FD+4LIN LTE в Твери.",
+    slug: "starline-b97-v2-lte",
+  },
 ];
 
 type PricingSeed = {
@@ -249,58 +287,194 @@ type PricingSeed = {
 };
 
 const STARLINE_PRICING_BASE: PricingSeed[] = [
-  { title: "StarLine A63 v2 ECO", price_from: "9 150 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A63 v2", price_from: "10 600 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A63 2CAN+2LIN ECO", price_from: "15 450 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A63 LTE ECO", price_from: "17 400 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A93 v2 ECO", price_from: "11 800 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A93 v2", price_from: "13 500 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A93 2CAN+2LIN ECO", price_from: "18 150 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A93 2CAN+2LIN", price_from: "20 650 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A93 LTE", price_from: "22 300 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A93 2CAN+2LIN LTE ECO", price_from: "28 900 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine A90 BT", price_from: "13 500 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine AS90 ECO", price_from: "13 500 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S66 v2 Mini", price_from: "14 900 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S66 v2", price_from: "17 100 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S66 v2 ECO", price_from: "15 850 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S66 v2 LTE", price_from: "19 700 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E66 v2 ECO", price_from: "15 450 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E66 GSM ECO", price_from: "23 700 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E96 v2 ECO", price_from: "18 150 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E96 v2", price_from: "20 650 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E96 GSM ECO", price_from: "26 750 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E96 GSM GPS", price_from: "30 400 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E96 GSM GPS PRO", price_from: "36 100 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E97", price_from: "20 650 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine E97 CAN FD GSM GPS", price_from: "30 400 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S96 v2", price_from: "20 650 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S96 GPS", price_from: "25 450 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S96 LTE", price_from: "23 300 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S96 ECO", price_from: "19 450 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S96 LTE GPS", price_from: "28 100 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S96 LTE GPS PRO", price_from: "35 700 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine T94 v2", price_from: "23 500 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine S97 CAN FD GPS", price_from: "25 450 ₽", comment: "По данным starline69.ru" },
-  { title: "StarLine B97 v2 3CAN+FD+4LIN LTE", price_from: "47 300 ₽", comment: "По данным starline69.ru" }
+  {
+    title: "StarLine A63 v2 ECO",
+    price_from: "9 150 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A63 v2",
+    price_from: "10 600 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A63 2CAN+2LIN ECO",
+    price_from: "15 450 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A63 LTE ECO",
+    price_from: "17 400 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A93 v2 ECO",
+    price_from: "11 800 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A93 v2",
+    price_from: "13 500 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A93 2CAN+2LIN ECO",
+    price_from: "18 150 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A93 2CAN+2LIN",
+    price_from: "20 650 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A93 LTE",
+    price_from: "22 300 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A93 2CAN+2LIN LTE ECO",
+    price_from: "28 900 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine A90 BT",
+    price_from: "13 500 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine AS90 ECO",
+    price_from: "13 500 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S66 v2 Mini",
+    price_from: "14 900 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S66 v2",
+    price_from: "17 100 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S66 v2 ECO",
+    price_from: "15 850 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S66 v2 LTE",
+    price_from: "19 700 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E66 v2 ECO",
+    price_from: "15 450 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E66 GSM ECO",
+    price_from: "23 700 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E96 v2 ECO",
+    price_from: "18 150 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E96 v2",
+    price_from: "20 650 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E96 GSM ECO",
+    price_from: "26 750 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E96 GSM GPS",
+    price_from: "30 400 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E96 GSM GPS PRO",
+    price_from: "36 100 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E97",
+    price_from: "20 650 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine E97 CAN FD GSM GPS",
+    price_from: "30 400 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S96 v2",
+    price_from: "20 650 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S96 GPS",
+    price_from: "25 450 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S96 LTE",
+    price_from: "23 300 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S96 ECO",
+    price_from: "19 450 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S96 LTE GPS",
+    price_from: "28 100 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S96 LTE GPS PRO",
+    price_from: "35 700 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine T94 v2",
+    price_from: "23 500 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine S97 CAN FD GPS",
+    price_from: "25 450 ₽",
+    comment: "По данным starline69.ru",
+  },
+  {
+    title: "StarLine B97 v2 3CAN+FD+4LIN LTE",
+    price_from: "47 300 ₽",
+    comment: "По данным starline69.ru",
+  },
 ];
 
 const STARLINE_REVIEW_SEEDS = [
   {
     author: "Александр Глушаков",
     text: "Вежливый персонал, консультация и установка на хорошем уровне. Остался доволен сервисом.",
-    rating: 5
+    rating: 5,
   },
   {
     author: "Сергей Сальников",
     text: "Выполнили установку StarLine быстро и качественно, подробно объяснили работу системы.",
-    rating: 5
+    rating: 5,
   },
   {
     author: "Арсений Давыдов",
     text: "Понравилось отношение к клиенту и аккуратность работ. Рекомендую центр в Твери.",
-    rating: 5
-  }
+    rating: 5,
+  },
 ];
 
 function sleepSync(ms: number): void {
@@ -317,8 +491,14 @@ function withBusyRetry<T>(task: () => T, retries = 30): T {
     try {
       return task();
     } catch (error) {
-      const sqliteError = error as { code?: string; errcode?: number; errstr?: string; message?: string };
-      const text = `${sqliteError.message || ""} ${sqliteError.errstr || ""}`.toLowerCase();
+      const sqliteError = error as {
+        code?: string;
+        errcode?: number;
+        errstr?: string;
+        message?: string;
+      };
+      const text =
+        `${sqliteError.message || ""} ${sqliteError.errstr || ""}`.toLowerCase();
       const isBusy =
         sqliteError.code === "SQLITE_BUSY" ||
         sqliteError.errcode === 5 ||
@@ -422,6 +602,7 @@ function createSchema(): void {
       car_brand TEXT NOT NULL,
       car_model TEXT NOT NULL,
       car_year INTEGER NOT NULL,
+      gearbox TEXT NOT NULL DEFAULT '',
       start_type TEXT NOT NULL DEFAULT '',
       is_under_warranty INTEGER NOT NULL DEFAULT 0,
       features_json TEXT NOT NULL DEFAULT '[]',
@@ -481,15 +662,20 @@ function createSchema(): void {
   `);
 }
 
-function hasColumn(table: "site_settings" | "page_content" | "contact_requests", column: string): boolean {
-  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+function hasColumn(
+  table: "site_settings" | "page_content" | "contact_requests",
+  column: string,
+): boolean {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{
+    name: string;
+  }>;
   return columns.some((item) => item.name === column);
 }
 
 function addColumnIfMissing(
   table: "site_settings" | "page_content" | "contact_requests",
   column: string,
-  sql: string
+  sql: string,
 ): void {
   if (hasColumn(table, column)) {
     return;
@@ -499,7 +685,8 @@ function addColumnIfMissing(
     db.exec(sql);
   } catch (error) {
     const sqliteError = error as { message?: string; errstr?: string };
-    const text = `${sqliteError.message || ""} ${sqliteError.errstr || ""}`.toLowerCase();
+    const text =
+      `${sqliteError.message || ""} ${sqliteError.errstr || ""}`.toLowerCase();
     const isDuplicateColumn = text.includes("duplicate column");
 
     if (!isDuplicateColumn) {
@@ -509,74 +696,111 @@ function addColumnIfMissing(
 }
 
 function ensureSchemaColumns(): void {
-  addColumnIfMissing("site_settings", "whatsapp_url", "ALTER TABLE site_settings ADD COLUMN whatsapp_url TEXT NOT NULL DEFAULT ''");
-  addColumnIfMissing("site_settings", "telegram_url", "ALTER TABLE site_settings ADD COLUMN telegram_url TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(
+    "site_settings",
+    "whatsapp_url",
+    "ALTER TABLE site_settings ADD COLUMN whatsapp_url TEXT NOT NULL DEFAULT ''",
+  );
+  addColumnIfMissing(
+    "site_settings",
+    "telegram_url",
+    "ALTER TABLE site_settings ADD COLUMN telegram_url TEXT NOT NULL DEFAULT ''",
+  );
   addColumnIfMissing(
     "site_settings",
     "telegram_bot_token",
-    "ALTER TABLE site_settings ADD COLUMN telegram_bot_token TEXT NOT NULL DEFAULT ''"
+    "ALTER TABLE site_settings ADD COLUMN telegram_bot_token TEXT NOT NULL DEFAULT ''",
   );
   addColumnIfMissing(
     "site_settings",
     "telegram_chat_id",
-    "ALTER TABLE site_settings ADD COLUMN telegram_chat_id TEXT NOT NULL DEFAULT ''"
+    "ALTER TABLE site_settings ADD COLUMN telegram_chat_id TEXT NOT NULL DEFAULT ''",
   );
-  addColumnIfMissing("site_settings", "metrika_id", "ALTER TABLE site_settings ADD COLUMN metrika_id TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(
+    "site_settings",
+    "metrika_id",
+    "ALTER TABLE site_settings ADD COLUMN metrika_id TEXT NOT NULL DEFAULT ''",
+  );
   addColumnIfMissing(
     "site_settings",
     "whatsapp_template",
-    "ALTER TABLE site_settings ADD COLUMN whatsapp_template TEXT NOT NULL DEFAULT ''"
+    "ALTER TABLE site_settings ADD COLUMN whatsapp_template TEXT NOT NULL DEFAULT ''",
   );
   addColumnIfMissing(
     "site_settings",
     "telegram_template",
-    "ALTER TABLE site_settings ADD COLUMN telegram_template TEXT NOT NULL DEFAULT ''"
+    "ALTER TABLE site_settings ADD COLUMN telegram_template TEXT NOT NULL DEFAULT ''",
   );
-  addColumnIfMissing("site_settings", "call_template", "ALTER TABLE site_settings ADD COLUMN call_template TEXT NOT NULL DEFAULT ''");
-  addColumnIfMissing("page_content", "faq_json", "ALTER TABLE page_content ADD COLUMN faq_json TEXT NOT NULL DEFAULT '[]'");
-  addColumnIfMissing("contact_requests", "start_type", "ALTER TABLE contact_requests ADD COLUMN start_type TEXT NOT NULL DEFAULT ''");
+  addColumnIfMissing(
+    "site_settings",
+    "call_template",
+    "ALTER TABLE site_settings ADD COLUMN call_template TEXT NOT NULL DEFAULT ''",
+  );
+  addColumnIfMissing(
+    "page_content",
+    "faq_json",
+    "ALTER TABLE page_content ADD COLUMN faq_json TEXT NOT NULL DEFAULT '[]'",
+  );
+  addColumnIfMissing(
+    "contact_requests",
+    "gearbox",
+    "ALTER TABLE contact_requests ADD COLUMN gearbox TEXT NOT NULL DEFAULT ''",
+  );
+  addColumnIfMissing(
+    "contact_requests",
+    "start_type",
+    "ALTER TABLE contact_requests ADD COLUMN start_type TEXT NOT NULL DEFAULT ''",
+  );
   addColumnIfMissing(
     "contact_requests",
     "is_under_warranty",
-    "ALTER TABLE contact_requests ADD COLUMN is_under_warranty INTEGER NOT NULL DEFAULT 0"
+    "ALTER TABLE contact_requests ADD COLUMN is_under_warranty INTEGER NOT NULL DEFAULT 0",
   );
   addColumnIfMissing(
     "contact_requests",
     "features_json",
-    "ALTER TABLE contact_requests ADD COLUMN features_json TEXT NOT NULL DEFAULT '[]'"
+    "ALTER TABLE contact_requests ADD COLUMN features_json TEXT NOT NULL DEFAULT '[]'",
   );
   addColumnIfMissing(
     "contact_requests",
     "needs_old_demount",
-    "ALTER TABLE contact_requests ADD COLUMN needs_old_demount INTEGER NOT NULL DEFAULT 0"
+    "ALTER TABLE contact_requests ADD COLUMN needs_old_demount INTEGER NOT NULL DEFAULT 0",
   );
   addColumnIfMissing(
     "contact_requests",
     "selection_stage",
-    "ALTER TABLE contact_requests ADD COLUMN selection_stage TEXT NOT NULL DEFAULT ''"
+    "ALTER TABLE contact_requests ADD COLUMN selection_stage TEXT NOT NULL DEFAULT ''",
   );
   addColumnIfMissing(
     "contact_requests",
     "desired_slot",
-    "ALTER TABLE contact_requests ADD COLUMN desired_slot TEXT NOT NULL DEFAULT ''"
+    "ALTER TABLE contact_requests ADD COLUMN desired_slot TEXT NOT NULL DEFAULT ''",
   );
-  addColumnIfMissing("contact_requests", "status", "ALTER TABLE contact_requests ADD COLUMN status TEXT NOT NULL DEFAULT 'new'");
+  addColumnIfMissing(
+    "contact_requests",
+    "status",
+    "ALTER TABLE contact_requests ADD COLUMN status TEXT NOT NULL DEFAULT 'new'",
+  );
   addColumnIfMissing(
     "contact_requests",
     "sla_alert_sent_at",
-    "ALTER TABLE contact_requests ADD COLUMN sla_alert_sent_at TEXT NOT NULL DEFAULT ''"
+    "ALTER TABLE contact_requests ADD COLUMN sla_alert_sent_at TEXT NOT NULL DEFAULT ''",
   );
 }
 
 function isLegacySeedData(): boolean {
-  const settings = db.prepare("SELECT center_name FROM site_settings WHERE id = 1").get() as
+  const settings = db
+    .prepare("SELECT center_name FROM site_settings WHERE id = 1")
+    .get() as
     | {
         center_name: string;
       }
     | undefined;
 
   const legacyServices = db
-    .prepare("SELECT COUNT(*) as count FROM services WHERE slug IN ('ustanovka-avtosignalizaciy', 'ustanovka-avtozapuska')")
+    .prepare(
+      "SELECT COUNT(*) as count FROM services WHERE slug IN ('ustanovka-avtosignalizaciy', 'ustanovka-avtozapuska')",
+    )
     .get() as { count: number };
 
   return settings?.center_name === "АвтоЩит 69" || legacyServices.count > 0;
@@ -600,7 +824,7 @@ function seedSettings(forceUpdate: boolean): void {
       @default_seo_title, @default_seo_description, @smtp_host, @smtp_port, @smtp_secure,
       @smtp_user, @smtp_password, @updated_at
     )
-    `
+    `,
   ).run({ ...DEFAULT_SETTINGS, updated_at: timestamp });
 
   db.prepare(
@@ -617,12 +841,12 @@ function seedSettings(forceUpdate: boolean): void {
         OR telegram_template IS NULL OR TRIM(telegram_template) = ''
         OR call_template IS NULL OR TRIM(call_template) = ''
       )
-    `
+    `,
   ).run({
     whatsapp_template: DEFAULT_SETTINGS.whatsapp_template,
     telegram_template: DEFAULT_SETTINGS.telegram_template,
     call_template: DEFAULT_SETTINGS.call_template,
-    updated_at: timestamp
+    updated_at: timestamp,
   });
 
   if (forceUpdate) {
@@ -648,7 +872,7 @@ function seedSettings(forceUpdate: boolean): void {
         default_seo_description = @default_seo_description,
         updated_at = @updated_at
       WHERE id = 1
-      `
+      `,
     ).run({ ...DEFAULT_SETTINGS, updated_at: timestamp });
   }
 }
@@ -665,7 +889,7 @@ function seedPageContent(forceUpdate: boolean): void {
       1, @hero_title, @hero_subtitle, @hero_button_text, @advantages_json, @faq_json,
       @about_text, @home_seo_title, @home_seo_description, @updated_at
     )
-    `
+    `,
   ).run({ ...DEFAULT_CONTENT, updated_at: timestamp });
 
   db.prepare(
@@ -673,7 +897,7 @@ function seedPageContent(forceUpdate: boolean): void {
     UPDATE page_content
     SET faq_json = @faq_json, updated_at = @updated_at
     WHERE id = 1 AND (faq_json IS NULL OR TRIM(faq_json) = '' OR TRIM(faq_json) = '[]')
-    `
+    `,
   ).run({ faq_json: DEFAULT_CONTENT.faq_json, updated_at: timestamp });
 
   if (forceUpdate) {
@@ -690,14 +914,16 @@ function seedPageContent(forceUpdate: boolean): void {
         home_seo_description = @home_seo_description,
         updated_at = @updated_at
       WHERE id = 1
-      `
+      `,
     ).run({ ...DEFAULT_CONTENT, updated_at: timestamp });
   }
 }
 
 function scrubCopiedContacts(): void {
   const row = db
-    .prepare("SELECT phone, email, request_email, address FROM site_settings WHERE id = 1")
+    .prepare(
+      "SELECT phone, email, request_email, address FROM site_settings WHERE id = 1",
+    )
     .get() as
     | {
         phone: string;
@@ -730,13 +956,13 @@ function scrubCopiedContacts(): void {
       address = @address,
       updated_at = @updated_at
     WHERE id = 1
-    `
+    `,
   ).run({
     phone: DEFAULT_SETTINGS.phone,
     email: DEFAULT_SETTINGS.email,
     request_email: DEFAULT_SETTINGS.request_email,
     address: DEFAULT_SETTINGS.address,
-    updated_at: now()
+    updated_at: now(),
   });
 }
 
@@ -750,16 +976,18 @@ function seedAdmin(): void {
     INSERT INTO admin (login, password_hash, created_at)
     SELECT @login, @password_hash, @created_at
     WHERE NOT EXISTS (SELECT 1 FROM admin LIMIT 1)
-    `
+    `,
   ).run({
     login,
     password_hash: passwordHash,
-    created_at: now()
+    created_at: now(),
   });
 }
 
 function seedServices(forceReplace: boolean): void {
-  const count = db.prepare("SELECT COUNT(*) as count FROM services").get() as { count: number };
+  const count = db.prepare("SELECT COUNT(*) as count FROM services").get() as {
+    count: number;
+  };
   if (count.count > 0 && !forceReplace) {
     return;
   }
@@ -778,20 +1006,22 @@ function seedServices(forceReplace: boolean): void {
       @title, @short_description, @description, @price_from, @image_url,
       @seo_title, @seo_description, @slug, @created_at, @updated_at
     )
-    `
+    `,
   );
 
   for (const service of STARLINE_SERVICE_SEEDS) {
     insertService.run({
       ...service,
       created_at: timestamp,
-      updated_at: timestamp
+      updated_at: timestamp,
     });
   }
 }
 
 function seedPricing(forceReplace: boolean): void {
-  const count = db.prepare("SELECT COUNT(*) as count FROM pricing").get() as { count: number };
+  const count = db.prepare("SELECT COUNT(*) as count FROM pricing").get() as {
+    count: number;
+  };
   if (count.count > 0 && !forceReplace) {
     return;
   }
@@ -802,16 +1032,25 @@ function seedPricing(forceReplace: boolean): void {
 
   const timestamp = now();
   const insertPricing = db.prepare(
-    "INSERT INTO pricing (title, price_from, comment, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)"
+    "INSERT INTO pricing (title, price_from, comment, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
   );
 
   STARLINE_PRICING_BASE.forEach((item, index) => {
-    insertPricing.run(item.title, item.price_from, item.comment, (index + 1) * 10, timestamp, timestamp);
+    insertPricing.run(
+      item.title,
+      item.price_from,
+      item.comment,
+      (index + 1) * 10,
+      timestamp,
+      timestamp,
+    );
   });
 }
 
 function seedReviews(forceReplace: boolean): void {
-  const count = db.prepare("SELECT COUNT(*) as count FROM reviews").get() as { count: number };
+  const count = db.prepare("SELECT COUNT(*) as count FROM reviews").get() as {
+    count: number;
+  };
   if (count.count > 0 && !forceReplace) {
     return;
   }
@@ -821,10 +1060,18 @@ function seedReviews(forceReplace: boolean): void {
   }
 
   const timestamp = now();
-  const insertReview = db.prepare("INSERT INTO reviews (author, text, rating, created_at, updated_at) VALUES (?, ?, ?, ?, ?)");
+  const insertReview = db.prepare(
+    "INSERT INTO reviews (author, text, rating, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+  );
 
   for (const review of STARLINE_REVIEW_SEEDS) {
-    insertReview.run(review.author, review.text, review.rating, timestamp, timestamp);
+    insertReview.run(
+      review.author,
+      review.text,
+      review.rating,
+      timestamp,
+      timestamp,
+    );
   }
 }
 

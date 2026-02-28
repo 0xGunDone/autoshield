@@ -2,6 +2,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { requireAdminPage } from "@/lib/auth";
 import type { ContactRequest } from "@/lib/types";
 import { getSiteSettings, listContactRequestsFiltered } from "@/lib/repository";
+import { deleteRequestAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,14 @@ type Props = {
 
 function toYesNo(value: number): string {
   return value ? "Да" : "Нет";
+}
+
+function gearboxLabel(value: string): string {
+  if (value === "manual") return "Механика";
+  if (value === "auto" || value === "automatic") return "Автомат";
+  if (value === "robot") return "Робот";
+  if (value === "cvt") return "Вариатор";
+  return "Не указано";
 }
 
 function startTypeLabel(value: string): string {
@@ -82,7 +91,7 @@ function featuresLabel(value: string): string {
     phone: "С телефона",
     gsm: "GSM",
     gps: "GPS",
-    unsure: "Затрудняюсь"
+    unsure: "Затрудняюсь",
   };
 
   try {
@@ -110,8 +119,15 @@ function parseStatus(value: string): "all" | "new" | "in_progress" | "closed" {
   return "all";
 }
 
-function parseTag(value: string): "all" | "warranty" | "autostart" | "consultation" | "sla_overdue" {
-  if (value === "warranty" || value === "autostart" || value === "consultation" || value === "sla_overdue") {
+function parseTag(
+  value: string,
+): "all" | "warranty" | "autostart" | "consultation" | "sla_overdue" {
+  if (
+    value === "warranty" ||
+    value === "autostart" ||
+    value === "consultation" ||
+    value === "sla_overdue"
+  ) {
     return value;
   }
   return "all";
@@ -141,7 +157,11 @@ function buildRequestTags(request: ContactRequest): string[] {
   return tags;
 }
 
-function renderTemplate(template: string, request: ContactRequest, centerName: string): string {
+function renderTemplate(
+  template: string,
+  request: ContactRequest,
+  centerName: string,
+): string {
   const replacements: Record<string, string> = {
     id: String(request.id),
     name: request.name,
@@ -150,10 +170,13 @@ function renderTemplate(template: string, request: ContactRequest, centerName: s
     car_model: request.car_model,
     car_year: String(request.car_year),
     features: featuresLabel(request.features_json),
-    center_name: centerName
+    center_name: centerName,
   };
 
-  return template.replace(/\{([a-z_]+)\}/gi, (_, key: string) => replacements[key] || "");
+  return template.replace(
+    /\{([a-z_]+)\}/gi,
+    (_, key: string) => replacements[key] || "",
+  );
 }
 
 function normalizeWhatsappPhone(input: string): string {
@@ -174,7 +197,7 @@ export default async function AdminRequestsPage({ searchParams }: Props) {
   const requests = listContactRequestsFiltered({
     status,
     tag,
-    query
+    query,
   });
 
   const filterParams = new URLSearchParams();
@@ -192,7 +215,11 @@ export default async function AdminRequestsPage({ searchParams }: Props) {
 
   return (
     <AdminShell title="Заявки с формы записи">
-      <form className="glass rounded-2xl p-4 grid gap-3 md:grid-cols-[160px_170px_1fr_auto_auto]" method="get" action="/admin/requests">
+      <form
+        className="glass rounded-2xl p-4 grid gap-3 md:grid-cols-[160px_170px_1fr_auto_auto]"
+        method="get"
+        action="/admin/requests"
+      >
         <select name="status" defaultValue={status}>
           <option value="all">Все статусы</option>
           <option value="new">Новые</option>
@@ -206,7 +233,11 @@ export default async function AdminRequestsPage({ searchParams }: Props) {
           <option value="consultation">Консультация</option>
           <option value="sla_overdue">SLA &gt; 15 мин</option>
         </select>
-        <input name="q" defaultValue={query} placeholder="Поиск: имя, телефон, авто" />
+        <input
+          name="q"
+          defaultValue={query}
+          placeholder="Поиск: имя, телефон, авто"
+        />
         <button className="primary-btn font-semibold" type="submit">
           Применить
         </button>
@@ -215,11 +246,19 @@ export default async function AdminRequestsPage({ searchParams }: Props) {
         </a>
       </form>
 
-      {searchParams?.updated ? <p className="text-sm text-emerald-200">Статус заявки обновлён.</p> : null}
-      {searchParams?.error ? <p className="text-sm text-rose-300">Ошибка: не удалось выполнить действие.</p> : null}
+      {searchParams?.updated ? (
+        <p className="text-sm text-emerald-200">Статус заявки обновлён.</p>
+      ) : null}
+      {searchParams?.error ? (
+        <p className="text-sm text-rose-300">
+          Ошибка: не удалось выполнить действие.
+        </p>
+      ) : null}
 
       <div className="space-y-3">
-        {requests.length === 0 ? <p className="text-slate-300">Пока заявок нет.</p> : null}
+        {requests.length === 0 ? (
+          <p className="text-slate-300">Пока заявок нет.</p>
+        ) : null}
 
         {requests.map((request) => (
           <article key={request.id} className="glass rounded-2xl p-4">
@@ -228,7 +267,10 @@ export default async function AdminRequestsPage({ searchParams }: Props) {
               return quickTags.length > 0 ? (
                 <div className="mb-2 flex flex-wrap gap-2">
                   {quickTags.map((item) => (
-                    <span key={item} className="rounded-full border border-slate-300/70 bg-white/80 px-2 py-1 text-xs text-slate-700">
+                    <span
+                      key={item}
+                      className="rounded-full border border-slate-300/70 bg-white/80 px-2 py-1 text-xs text-slate-700"
+                    >
                       {item}
                     </span>
                   ))}
@@ -240,27 +282,66 @@ export default async function AdminRequestsPage({ searchParams }: Props) {
                 #{request.id} {request.name} — {request.phone}
               </h2>
               <div className="flex items-center gap-2">
-                <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass(request.status)}`}>
+                <span
+                  className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass(request.status)}`}
+                >
                   {statusLabel(request.status)}
                 </span>
-                <p className="text-xs text-slate-400">{new Date(request.created_at).toLocaleString("ru-RU")}</p>
+                <p className="text-xs text-slate-400">
+                  {new Date(request.created_at).toLocaleString("ru-RU")}
+                </p>
               </div>
             </div>
             <div className="mt-2 grid gap-2 text-sm text-slate-200 md:grid-cols-2">
-              <p><b>Авто:</b> {request.car_brand} {request.car_model}, {request.car_year}</p>
-              <p><b>Запуск:</b> {startTypeLabel(request.start_type)}</p>
-              <p><b>На гарантии:</b> {toYesNo(request.is_under_warranty)}</p>
-              <p><b>Функции:</b> {featuresLabel(request.features_json)}</p>
-              <p><b>Демонтаж старой:</b> {toYesNo(request.needs_old_demount)}</p>
-              <p><b>Статус выбора:</b> {selectionStageLabel(request.selection_stage)}</p>
-              <p><b>Желаемый слот:</b> {desiredSlotLabel(request.desired_slot)}</p>
-              <p><b>IP:</b> {request.ip}</p>
+              <p>
+                <b>Авто:</b> {request.car_brand} {request.car_model},{" "}
+                {request.car_year}
+              </p>
+              <p>
+                <b>КПП:</b> {gearboxLabel(request.gearbox)}
+              </p>
+              <p>
+                <b>Запуск:</b> {startTypeLabel(request.start_type)}
+              </p>
+              <p>
+                <b>На гарантии:</b> {toYesNo(request.is_under_warranty)}
+              </p>
+              <p>
+                <b>Функции:</b> {featuresLabel(request.features_json)}
+              </p>
+              <p>
+                <b>Демонтаж старой:</b> {toYesNo(request.needs_old_demount)}
+              </p>
+              <p>
+                <b>Статус выбора:</b>{" "}
+                {selectionStageLabel(request.selection_stage)}
+              </p>
+              <p>
+                <b>Желаемый слот:</b> {desiredSlotLabel(request.desired_slot)}
+              </p>
+              <p>
+                <b>IP:</b> {request.ip}
+              </p>
             </div>
-            {request.comment ? <p className="mt-2 text-sm text-slate-300"><b>Комментарий:</b> {request.comment}</p> : null}
+            {request.comment ? (
+              <p className="mt-2 text-sm text-slate-300">
+                <b>Комментарий:</b> {request.comment}
+              </p>
+            ) : null}
 
-            <form method="post" action={`/api/admin/requests/${request.id}/status`} className="mt-3 flex flex-wrap gap-2">
+            <form
+              method="post"
+              action={`/api/admin/requests/${request.id}/status`}
+              className="mt-3 flex flex-wrap gap-2"
+            >
               <input type="hidden" name="redirect" value={redirectPath} />
-              <button type="submit" name="status" value="new" className="ghost-btn text-xs" disabled={request.status === "new"}>
+              <button
+                type="submit"
+                name="status"
+                value="new"
+                className="ghost-btn text-xs"
+                disabled={request.status === "new"}
+              >
                 Новая
               </button>
               <button
@@ -272,38 +353,73 @@ export default async function AdminRequestsPage({ searchParams }: Props) {
               >
                 В работе
               </button>
-              <button type="submit" name="status" value="closed" className="ghost-btn text-xs" disabled={request.status === "closed"}>
+              <button
+                type="submit"
+                name="status"
+                value="closed"
+                className="ghost-btn text-xs"
+                disabled={request.status === "closed"}
+              >
                 Закрыта
               </button>
             </form>
 
-            <div className="mt-3 grid gap-2 md:grid-cols-3">
-              <a
-                className="ghost-btn text-center text-xs"
-                target="_blank"
-                rel="noreferrer"
-                href={`https://wa.me/${normalizeWhatsappPhone(request.phone)}?text=${encodeURIComponent(
-                  renderTemplate(settings.whatsapp_template, request, settings.center_name)
-                )}`}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-white/5 pt-3">
+              <div className="grid flex-1 gap-2 md:grid-cols-3">
+                <a
+                  className="ghost-btn text-center text-xs"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`https://wa.me/${normalizeWhatsappPhone(request.phone)}?text=${encodeURIComponent(
+                    renderTemplate(
+                      settings.whatsapp_template,
+                      request,
+                      settings.center_name,
+                    ),
+                  )}`}
+                >
+                  WhatsApp
+                </a>
+                <a
+                  className="ghost-btn text-center text-xs"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`https://t.me/share/url?url=${encodeURIComponent(process.env.SITE_URL || "")}&text=${encodeURIComponent(
+                    renderTemplate(
+                      settings.telegram_template,
+                      request,
+                      settings.center_name,
+                    ),
+                  )}`}
+                >
+                  Telegram
+                </a>
+                <details className="glass rounded-xl p-2 relative">
+                  <summary className="cursor-pointer text-xs font-semibold">
+                    Скрипт звонка
+                  </summary>
+                  <p className="mt-2 whitespace-pre-line text-xs text-slate-300">
+                    {renderTemplate(
+                      settings.call_template,
+                      request,
+                      settings.center_name,
+                    )}
+                  </p>
+                </details>
+              </div>
+
+              <form
+                action={deleteRequestAction}
+                className="shrink-0 flex items-center"
               >
-                WhatsApp
-              </a>
-              <a
-                className="ghost-btn text-center text-xs"
-                target="_blank"
-                rel="noreferrer"
-                href={`https://t.me/share/url?url=${encodeURIComponent(process.env.SITE_URL || "")}&text=${encodeURIComponent(
-                  renderTemplate(settings.telegram_template, request, settings.center_name)
-                )}`}
-              >
-                Telegram
-              </a>
-              <details className="glass rounded-xl p-2">
-                <summary className="cursor-pointer text-xs font-semibold">Скрипт звонка</summary>
-                <p className="mt-2 whitespace-pre-line text-xs text-slate-300">
-                  {renderTemplate(settings.call_template, request, settings.center_name)}
-                </p>
-              </details>
+                <input type="hidden" name="id" value={request.id} />
+                <button
+                  type="submit"
+                  className="ghost-btn !text-xs !text-rose-400 hover:!bg-rose-500/10 hover:!text-rose-300"
+                >
+                  Удалить
+                </button>
+              </form>
             </div>
           </article>
         ))}
