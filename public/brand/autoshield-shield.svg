@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" fill="none">
+  <defs>
+    <linearGradient id="shieldFillPublic" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="58%" stop-color="#a5f3fc"/>
+      <stop offset="100%" stop-color="#86efac"/>
+    </linearGradient>
+    <linearGradient id="shieldStrokePublic" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M50 5 L89 20 V52 C89 76 74 94 50 105 C26 94 11 76 11 52 V20 Z" fill="url(#shieldFillPublic)" stroke="url(#shieldStrokePublic)" stroke-width="4"/>
+  <path d="M50 14 L81 26 V50 C81 69 69 84 50 94 C31 84 19 69 19 50 V26 Z" fill="rgba(255,255,255,0.58)" stroke="rgba(2,132,199,0.5)" stroke-width="1.6"/>
+
+  <text x="50" y="45" text-anchor="middle" font-size="16" font-weight="800" fill="#0c4a6e" style="font-family: Arial, sans-serif; letter-spacing:1px;">АВТО</text>
+  <text x="50" y="70" text-anchor="middle" font-size="24" font-weight="900" fill="#065f46" style="font-family: Arial, sans-serif; letter-spacing:0.6px;">69</text>
+</svg>
